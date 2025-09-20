@@ -1,1 +1,107 @@
-abcd dat con de di ia
+using System;
+
+class CaroGame
+{
+    static char[,] board = new char[15, 15]; // Bàn cờ 15x15
+    static char currentPlayer = 'X'; // Người chơi bắt đầu là 'X'
+
+    static void Main()
+    {
+        InitializeBoard();
+        PrintBoard();
+
+        while (true)
+        {
+            Console.WriteLine($"Lượt chơi của {currentPlayer}");
+            Console.Write("Nhập hàng (1-15): ");
+            int row = int.Parse(Console.ReadLine()) - 1;
+            Console.Write("Nhập cột (1-15): ");
+            int col = int.Parse(Console.ReadLine()) - 1;
+
+            if (row < 0 || row >= 15 || col < 0 || col >= 15 || board[row, col] != '-')
+            {
+                Console.WriteLine("Vị trí không hợp lệ, vui lòng chọn lại.");
+                continue;
+            }
+
+            board[row, col] = currentPlayer;
+            PrintBoard();
+
+            if (CheckWin(row, col))
+            {
+                Console.WriteLine($"Chúc mừng {currentPlayer}, bạn đã thắng!");
+                break;
+            }
+
+            currentPlayer = (currentPlayer == 'X') ? 'O' : 'X'; // Chuyển lượt cho người chơi khác
+        }
+    }
+
+    // Khởi tạo bàn cờ
+    static void InitializeBoard()
+    {
+        for (int i = 0; i < 15; i++)
+        {
+            for (int j = 0; j < 15; j++)
+            {
+                board[i, j] = '-';
+            }
+        }
+    }
+
+    // In bàn cờ
+    static void PrintBoard()
+    {
+        Console.Clear();
+        for (int i = 0; i < 15; i++)
+        {
+            for (int j = 0; j < 15; j++)
+            {
+                Console.Write(board[i, j] + " ");
+            }
+            Console.WriteLine();
+        }
+    }
+
+    // Kiểm tra nếu người chơi thắng
+    static bool CheckWin(int row, int col)
+    {
+        return CheckDirection(row, col, 1, 0) || // Kiểm tra theo chiều ngang
+               CheckDirection(row, col, 0, 1) || // Kiểm tra theo chiều dọc
+               CheckDirection(row, col, 1, 1) || // Kiểm tra theo đường chéo /
+               CheckDirection(row, col, 1, -1);  // Kiểm tra theo đường chéo \
+    }
+
+    // Kiểm tra theo một hướng cụ thể
+    static bool CheckDirection(int row, int col, int dRow, int dCol)
+    {
+        int count = 1;
+        // Kiểm tra theo hướng dương (tiến về phía bên phải, xuống dưới...)
+        count += CountInDirection(row, col, dRow, dCol);
+        // Kiểm tra theo hướng âm (quay lại hướng ngược lại)
+        count += CountInDirection(row, col, -dRow, -dCol);
+
+        return count >= 5; // Nếu có 5 quân liên tiếp
+    }
+
+    // Đếm số quân liên tiếp theo một hướng
+    static int CountInDirection(int row, int col, int dRow, int dCol)
+    {
+        int count = 0;
+        char current = board[row, col];
+
+        row += dRow;
+        col += dCol;
+
+        while (row >= 0 && row < 15 && col >= 0 && col < 15 && board[row, col] == current)
+        {
+            count++;
+            row += dRow;
+            col += dCol;
+        }
+
+        return count;
+    }
+}
+
+
